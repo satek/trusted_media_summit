@@ -2,7 +2,7 @@ class ImageProcessingController < ApplicationController
   skip_before_action :verify_authenticity_token
 
   rescue_from(ActionController::ParameterMissing) do |ex|
-    render text:  "Required parameter missing: #{ex.param}", status: :bad_request
+    render plain:  "Required parameter missing: #{ex.param}", status: :bad_request
   end
 
   def index
