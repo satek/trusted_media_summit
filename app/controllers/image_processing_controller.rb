@@ -5,11 +5,19 @@ class ImageProcessingController < ApplicationController
     render plain:  "Required parameter missing: #{ex.param}", status: :bad_request
   end
 
+  PERMITTED_PARAMS = %w[imageData x y width height scaleX scaleY rotate lang]
+
   def index
-    required_params = ["imageData", "x", "y", "width", "height", "scaleX", "scaleY", "rotate", "lang"]
-    image_params = params.require(required_params).permit(required_params).to_h
-    image_params['lang'] = 'en' unless image_params['lang']
     res = HTTParty.post('http://35.240.162.62:9000', body: image_params.to_json)
     render plain: res
+  end
+
+  private
+
+  def image_params
+    params.select { |k, _| PERMITTED_PARAMS.include?(k) }
+      .permit(PERMITTED_PARAMS).tap do |permitted|
+        permitted['lang'] = 'en' unless permitted['lang']
+      end
   end
 end
