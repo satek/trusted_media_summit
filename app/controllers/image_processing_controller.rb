@@ -34,10 +34,10 @@ class ImageProcessingController < ApplicationController
 
   def save_image
     img = Base64.decode64(params['imageData'])
-    name = "#{SecureRandom.uuid}.jpg"
+    name = "images/#{SecureRandom.uuid}.jpg"
     File.open(Rails.root.join('public', name), 'wb')
         .tap { |fl| fl.write(img) }
-    "images/#{name}"
+    name
   end
 
   def google_translate
