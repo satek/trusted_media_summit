@@ -15,14 +15,21 @@ class ImageProcessingController < ApplicationController
   end
 
   def language_list
-    languages = translate.languages.map(&:code)
+    languages = google_translate.languages.map(&:code)
     render json: languages
+  end
+
+  def translate
+    text = params.require(:text)
+    from = params.require(:from)
+    to = params.require(:to)
+    render plain: google_translate.translate(text, from: from, to: to)
   end
 
   private
 
-  def translate
-    @translate ||= Google::Cloud::Translate.new
+  def google_translate
+    @google_translate ||= Google::Cloud::Translate.new
   end
 
   def image_params
