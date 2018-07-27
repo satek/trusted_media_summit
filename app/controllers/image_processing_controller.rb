@@ -10,6 +10,10 @@ class ImageProcessingController < ApplicationController
   PERMITTED_PARAMS = %w[imageData x y width height scaleX scaleY rotate lang]
 
   def index
+    image_name = save_image
+    Rails.logger.info("IMG saved: #{image_name}")
+    image_params = extract_image_params
+    image_params['imageLocation'] = "#{request.env['HTTP_HOST']}/#{image_name}"
     res = HTTParty.post('http://35.240.162.62:9000', body: image_params.to_json)
     render plain: res
   end
@@ -28,11 +32,19 @@ class ImageProcessingController < ApplicationController
 
   private
 
+  def save_image
+    img = Base64.decode64(params['imageData'])
+    name = "#{SecureRandom.uuid}.jpg"
+    File.open(Rails.root.join('public', name), 'wb')
+        .tap { |fl| fl.write(img) }
+    "images/#{name}"
+  end
+
   def google_translate
     @google_translate ||= Google::Cloud::Translate.new
   end
 
-  def image_params
+  def extract_image_params
     params.select { |k, _| PERMITTED_PARAMS.include?(k) }
       .permit(PERMITTED_PARAMS).tap do |permitted|
         permitted['lang'] = 'en' unless permitted['lang']
