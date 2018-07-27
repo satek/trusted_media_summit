@@ -7,6 +7,10 @@ class ImageProcessingController < ApplicationController
     render plain:  "Required parameter missing: #{ex.param}", status: :bad_request
   end
 
+  rescue_from(Net::ReadTimeout) do |ex|
+    render plain:  "Service timeout", status: 500
+  end
+
   PERMITTED_PARAMS = %w[imageData x y width height scaleX scaleY rotate lang]
 
   def index
