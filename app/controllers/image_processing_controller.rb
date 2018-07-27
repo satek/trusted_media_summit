@@ -1,4 +1,5 @@
 require "google/cloud/translate"
+require "google/cloud/vision"
 
 class ImageProcessingController < ApplicationController
   skip_before_action :verify_authenticity_token
@@ -34,14 +35,31 @@ class ImageProcessingController < ApplicationController
     render plain: google_translate.translate(text, from: from, to: to)
   end
 
+  def text_extraction
+    image_name = save_image
+    path = Rails.root.join('public', image_name).to_s
+    image = google_vision.image(path)
+    image.context.languages = Array(params.require(:lang))
+    doc = image.document
+    render json: { text: doc.text }
+  end
+
   private
+
+  def image_digest
+    Digest::SHA256.hexdigest(params['imageData'])
+  end
 
   def save_image
     img = Base64.decode64(params['imageData'])
-    name = "images/#{SecureRandom.uuid}.jpg"
+    name = "images/#{image_digest}.jpg"
     File.open(Rails.root.join('public', name), 'wb')
         .tap { |fl| fl.write(img) }
     name
+  end
+
+  def google_vision
+    @google_vision ||= Google::Cloud::Vision.new
   end
 
   def google_translate
