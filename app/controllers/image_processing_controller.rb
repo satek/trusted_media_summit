@@ -1,3 +1,5 @@
+require "google/cloud/translate"
+
 class ImageProcessingController < ApplicationController
   skip_before_action :verify_authenticity_token
 
@@ -12,7 +14,16 @@ class ImageProcessingController < ApplicationController
     render plain: res
   end
 
+  def language_list
+    languages = translate.languages.map(&:code)
+    render json: languages
+  end
+
   private
+
+  def translate
+    @translate ||= Google::Cloud::Translate.new
+  end
 
   def image_params
     params.select { |k, _| PERMITTED_PARAMS.include?(k) }
