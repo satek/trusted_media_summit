@@ -4,4 +4,5 @@ Rails.application.routes.draw do
   match '/api/image', to: 'image_processing#index', via: [:options, :post]
   match '/api/language_list', to: 'image_processing#language_list', via: [:get]
   match '/api/translate', to: 'image_processing#translate', via: [:post]
+  match '/api/text_extraction', to: 'image_processing#text_extraction', via: [:post]
 end
