@@ -19,7 +19,7 @@ class ImageProcessingController < ApplicationController
     Rails.logger.info("IMG saved: #{image_name}")
     image_params = extract_image_params
     image_params['imageLocation'] = "#{request.env['HTTP_HOST']}/#{image_name}"
-    res = HTTParty.post('http://35.240.238.172', body: image_params.to_json)
+    res = HTTParty.post('http://35.240.194.185:9000', body: image_params.to_json)
     render plain: res
   end
 
